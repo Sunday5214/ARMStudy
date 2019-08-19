@@ -1,0 +1,8 @@
+AHB, APB
+CortexM3의 버스구조는 AMBA bus
+AHB->HostBus
+APB->페리페럴(주변기기) Bus
+AHB->bridge->APB
+APB1,2는 클럭의 공급이 다르기때문에 분리되어있음
+DMA->flash에 있는 데이터를 주기적으로 옮긴다 이로써 코어와 따로 작업가능
+단 DMA가 버스혹은 flash를 사용하고 있으면 코어가 사용하지 못함
