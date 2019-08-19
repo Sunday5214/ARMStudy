@@ -6,3 +6,27 @@ AHB->bridge->APB
 APB1,2는 클럭의 공급이 다르기때문에 분리되어있음
 DMA->flash에 있는 데이터를 주기적으로 옮긴다 이로써 코어와 따로 작업가능
 단 DMA가 버스혹은 flash를 사용하고 있으면 코어가 사용하지 못함
+
+volatile-->휘발성이라는 뜻 말그대로 휘발성인 RAM에 다가 바로 쓴다는 뜻인듯
+반복된 초기화사용시
+CashMemory를 거치지 않고 바로 memory로 접근할시
+
+4비트를 세팅해야 out,in을 정할 수 있음
+&= ~(0x0f << a) 특정 4비트를 초기화
+*((int*)0x4001080C)=5
+0x40010800
+GPIOA_ODR = 0xC
+->0x4001 080C
+
+GPIO_CRL
+
+GPIO제어시 GPIOPUSHPULL로셋팅
+
+STM32F103C8
+	   RB
+
+port를 설정하고
+portb를 사용으로 하고
+portb를 
+
+
