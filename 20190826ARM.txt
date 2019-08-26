@@ -1,0 +1,66 @@
+CPU는 펌웨어가 지사하는 대로 움직임 실제로도 0과 1로 이루어진 명령어의 집합을 처리할 뿐임
+DMA->코어를 거치지 않고 메모리에 바로 엑세스 단 DMA의 명령은 코어가 결정+DMA에 버스를 통해
+데이터를 전송할 시 코어는 그 버스를 사용하지 못함
+Bridge->클락을 공급해주는 것
+RCC->ResetClockControl 전원이 들어가면 가장 처음 클락이 공급되는 곳
+모든 주변기기(Peripheral)에 클락이 공급되어야한다.
+
+Low-Density
+Medium-Density
+High-Density
+Flash의 크기로와 주변기기(Peripherals)로 구분
+
+FHD 1920 1080
+현재 쓰고있는 친구는 320 240정도를 감당함
+
+GPIO
+보통push pull 1이나 0으로 셋팅해놓으면 1이나 0이 나감
+open-drain 1인지0인지 내부 회로를 측정해도 모름 외부에다가 풀업풀다운을 구현해주어야한다
+pushpull은 무조건 output
+open-drain은 IIC(I2C, I^2C) 통신시 데이터가 들어올때는 인풋 나갈때는 아웃풋으로 조정해주어야하기
+때문에 필요함
+
+Input
+풀업풀다운이 내부에 구현되어있음 근데 103라인은 쓰면안됨;
+Schmitt Trigger 아날로그인풋과 디지털인풋 설정에 따라 다르게 할 수 있다
+디지털인풋시 위의 트리거가 온되어 IDR로 보내고 아날로그 인풋시 오프되서 ODR로 보낸다
+Schmitt Trigger가 일정 V가 되면 1과 0을 디지털로 뽑아내기 위해 필요하다
+
+Alternate function
+uart, I2C 등 GPIO외의 핀을 제어
+
+PLL
+phase Locked Loop
+내가원하는 주파수와 딱 일치 Locked
+PLL을 통해 내가 원하는 주파수를 맞춰준다
+
+SYSCLK->72MHz
+AHB Prescaler->1
+HClock은 호스트버스가사용
+APB1-Timer 234 -> 36or 72
+APB2-Timer 1 -> 72
+
+HSI, HSE -> 40MHz를 외부에서 바로 공급 단 온도에 따라 바뀔 수 있기때문에 사용하지 않는게 좋음
+ 
+PLL -> 8MHz 
+
+클락모드 바꾸고 온풀고 클락정하고 다시 PLL모드하고 다시 온
+
+GPIOA는 반드시 클락이 공급되어야한다.
+
+실제 아날로그는 12bit AVR는 10 
+
+0xFFFF FFFF -> 4byte 8888
+즉 데이터와 주소 둘다 32비트
+2^32는 4G (K-> M-> G)
+
+PortA base Adress 0x4001 0800 
+PortA의 CRL->0x4001 0800, ODR 0x4001 080C
+RCC base Adress 0x4002 1000
+
+volatile 사용상황
+1. 캐쉬를 뛰어넘어 바로 RAM에 넣을때
+2. 중복코드나 불필요한 코드를 컴파일러가 최적화못하게 할때
+3. 레지스터를 직접 사용할때
+
+어셈블리 DCD vector 즉 배열
