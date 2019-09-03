@@ -1,0 +1,81 @@
+b[2][2] == *(*(b+2)+2)
+%s -> 주소값
+""는 C에서 실질적으로는 주소값을 담음
+char a[][3] == char (*a)[3]
+char a[][3][3] == char (*a)[3][3]
+
+소프트웨어적인 인터럽트, 하드웨어적인 인터럽트 둘다 가능(OR)로 되어있음
+인터럽트 마스크와 인터럽트 이벤트가 들어와야 and로 Pending Request 레지스터로 넘어간다
+NVIC로 신호가 들어가면 ISR로 넘어감
+
+NVIC_ISER -> 인터럽트설정
+NVIC_ICER -> 인터럽트비트클리어
+
+720 1Mhz 1us 
+*(volatile unsigned int *)(0x40021018) |= 0x04;//RCC셋팅, APB2ENR
+*(volatile unsigned int *)(0x40010800) = 0x40;//GPIOA_CRL(0~7) input
+*(volatile unsigned int *)(0x40010804) = 0x03;//GPIOA_CRH(8~16) output
+	
+*(volatile unsigned int *)(0x4001040C) = 0x02;//EXTI_FTSR->Falling설정
+*(volatile unsigned int *)(0x40010400) = 0x02;//EXTI_IMR->마스크
+*(volatile unsigned int *)(0xE000E100) |= 0x80; // NVIC-> ISR0
+
+9~5번은 같은 ISR을 가지지만 Pending Request의 값으로 구분한다
+
+AFIO
+수업시간에 PA를 PB로 바꾸는 것에 사용했다.
+이미 사용중인 핀이 있을 때 AF를 사용해서 다른 핀으로 바꿀 수 있다
+*(volatile unsigned int *)(0x40021018) |= 0x0D;//AFIO사용을 위해 C->D
+*(volatile unsigned int *)(0x40010800) &= ~(0x0F << 24);//floating input 1100 0001 //00C1
+*(volatile unsigned int *)(0x40010C00) &= ~(0x0F << 28);
+*(volatile unsigned int *)(0x40010800) |= (0x04 << 24);//floating input 1100 0001 //00C1
+*(volatile unsigned int *)(0x40010C00) |= (0x03 << 28);
+	
+*(volatile unsigned int *)(0x4001040C) = 0x40;//00 0000
+*(volatile unsigned int *)(0x40010400) = 0x40;
+*(volatile unsigned int *)(0xE000E100) |= 0x00800000;
+*(volatile unsigned int *)(0x4001000C) |= 0x0100;//AFIO base0x40010000+AFIO_EXTICR20x0C, 6번이므로 0100
+*(volatile unsigned int *)(0x40010C00) |= (0x04 << 24); //PB6을 설정
+
+timer
+//딜레이 코드
+void Delay(unsigned int nTime)
+{
+	TimingDelay = nTime;
+	
+	while(TimingDelay != 0);
+}
+void TimingDelay_Decrement(void)
+{
+	if(TimingDelay != 0x00)
+	{
+		TimingDelay--;
+	}
+}
+void SysTick_Handler(void)
+ {
+//	 GPIOB->ODR =0x01; 
+	 
+	ledLight1 = ~ledLight1;
+	if( ledLight1 )
+    	GPIOC->ODR &= ~(0x01 << 13);                           // switch on LED
+	else
+    	GPIOC->ODR |= (0x01 << 13); 				
+		
+	// 		GPIOB->ODR =0x00;	
+	
+//GPIOB->ODR =0x01; 					
+	//count++;
+	//GPIOB->ODR =0x00;
+	 
+//	if(count== 1000){
+//		count=0;
+//		ledLight3 = ~ledLight3;
+//		if( ledLight3 )
+//	    	GPIOB->ODR &= ~(0x01 << 4);                           // switch on LED
+//		else
+//	    	GPIOB->ODR |=  (0x01 << 4); 
+//	}
+			
+		                          // switch off LED
+ }
