@@ -1,0 +1,60 @@
+System Tick Timer 멀티프로세싱시 시분할 처리를 위한 시간분배를 담당하는
+타이머를 Tick Timer라고함
+CLKSOURCE = 1--> HCLK(72MHz, 72000000)
+RELOAD = 72000--> 72000000/72000= 1ms
+RELOAD = 72--> 72000000/72= 1us
+CLKSOURCE = 0
+
+아두이노의 DelayMicrosecond는 내부적으로 4us로 동작하므로
+4us 이하는 4us로 작동한다.
+
+RTOS의 Thread는 1ms마다 토글하는 방식이라 us단위로 제어가 안됨
+
+72MHz->72000000Hz
+72분주
+72000000/72 = 1000000Hz systick이 사용하는 주파수->1MHz
+
+	GPIOC->CRH &= ~(0x0F << 20);
+	GPIOC->CRH |= (0x03 << 20);
+	
+	*(volatile unsigned int*)0xE000E010 = 0x07;
+	*(volatile unsigned int*)0xE000E014 = 0x000002D0;
+
+systtick_handler에 count를 넣고
+count를 반환하는 함수를 만들면
+주파수를 10us에 맞춰 micros_10us를 만들 수 있다.
+
+HSI-->HighSpeedInteral->내부에서 저항과 캐패시터등을 통해 클락공급
+HSE-->HighSpeedExteral->외부에서 클락공급
+
+Timer234->APB1
+Timer1->APB2
+
+TIMx_CNT->TCNT
+TIMx_PSC->prescale
+TIMx_ARR->Auto Reload Register
+ARM에서는 오버플로우 인터럽트가 아닌 업데이트 인터럽트
+1us 1MHz
+10us 0.1MHz
+psc->72, arr->100 이면 100us마다 인터럽트
+Timer234번은 스테이터스 레지스터를 통해 인터럽트종류를 구분
+TIMx_CR1 00
+TIMx_DIER 0C
+TIMPSC 28
+TIMARR 2c
+NVIC 28==timer
+0xE000E100
+RCC
+APB1 0x01C
+2 0x018
+timer update인터럽트를 위한 순서
+FastPWM
+CC1IE를 온
+c_micros = micros_10us();
+if(c_micros - p_micros > 1000){
+p_micros = c_micros;
+pwm_var+=20;
+			
+if(pwm_var > 1800)pwm_var=20;
+TIM2->CCR1 = pwm_var;
+}
