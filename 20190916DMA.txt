@@ -1,0 +1,58 @@
+다다익코, DMA 채널별로 우선순위가 정해져있음
+메모리to메모리, 주변기기to메모리, 메모리to주변기기의 데이터 이동 때 사용됨
+CIRC 계속 옮기겠다(반복)
+DMA_CPART->주변기기의 메모리주소
+DMA_CMAR->메모리의 메모리주소
+
+ARM은 12bit에 0~3.3v를 /2^12, AVR은 10bit에  0~5V를 /2^10
+
+보통은 주변기기에서 메모리이지만 DIR을 체크하면 반대로됨
+MEM2MEM은 메모리에서 메모리로 데이터를 옮김
+
+PL은 우선순위
+
+PINC 주변기기주소 증가 사이즈를 32비트로해놓을 경우 한 번 옮기고 그다음번에 주변기기주소를 다음 32비트 시작으로
+옮김
+MINC 메모리주소 증가 주변기기의 PINC와 같음
+
+9 a b c 가들어오도록
+그대로 123456789abc가 들어오도록
+
+서순 우선순위 정하고 사이즈비트 정하고 카운트값정하고 주변기기주소넣고 메모리주소넣고 부가 옵션체크하고 enable
+
+DMA_CCRx->CIRC, MINC, PINC, MEM2MEM, EN 등을 설정
+DMA_CNDTRx->Count 값 설정
+DMA_CPARx->주변기기 주소
+DMA_CMARx->메모리 주소
+
+ADC클락은 12MHz
+셋팅후 ADC ON하면 컨버전시작
+EOC하면 끝 인터럽트를 할 수도 있고 하지 않을 수도 있다.
+
+ADCCLK = 14MHz, 1.5cycles->Tconv(Total Conversion time) = 1.5 + 12.5 = 14 cycles = 1us
+55.5cycle이면 55.5+12.5 = 68 cycles = 4.****us
+
+DMA(DMA사용여부), EXTTRIG(시작조건? SWSTART면 외부에서 시작을 하겠다), SCAN(Seq대로 하겠다), ADON(말그대로 시작)
+ADC에서 채널별로 데이터 레지스터에 넣을때 덮어쓰기 때문에 DMA의 PINC는 체크할 필요가 없다.
+하지만 MINC는 체크해야한다. 왜냐하면 데이터를 각각 따로 다른 메모리에 저장해야한다(그야 다른 데이터이니까)
+
+16진수로 나온값->10진수로->10진수/4096 * 3.3 하면 V가 나옴
+
+	GPIOA->CRL = 0x00000000;
+	
+	RCC->AHBENR |= (1<<0);
+	RCC->APB2ENR |= (1<<9);
+	
+	DMA1_Channel1->CNDTR = 0x00000003;
+	DMA1_Channel1->CPAR = 0x4001244C;
+	DMA1_Channel1->CMAR = 0x20002000;
+	DMA1_Channel1->CCR = 0x000005A1;
+	
+	ADC1->CR1 = 0x00000100;
+	ADC1->CR2 = 0x001E0103;
+	ADC1->SR |= (1<<1);
+	ADC1->SQR1 = (1<<21);
+	ADC1->SQR3 = 0x00000820;
+	ADC1->SMPR2 = 0x0000016D;
+	
+	ADC1->CR2 |= (1<<22);
