@@ -1,0 +1,236 @@
+UART
+Tx	Rx
+
+Rx	Tx
+
+GND	GND
+Full Duplex->양방향동시에
+Half Duplex->주고받고
+Sync->I2C
+Async->UART(클락핀이 없음)
+
+SCL->클락핀, 클락에 맞춰 Rising시에 데이터가 전송
+SDA->SCL클락에 맞춰 데이터전송
+Master		Slave
+Master만이 클락을 줌
+Slave는 오직 마스터에게 답만을 해줄 수 있음
+EEPROM->내부에 위치한 EEPROM은 레지스터를 통해 제어, 외부에 있는 EEPROM을 I2C를 사용해 제어한다
+Master는 여러개의 Slave를 연결할 수 있는데 이에 대한 Slave으 구분은 칩의 Id로 판정한다
+5V 풀업이 걸려있음
+
+StartSIGNAL->풀업이므로 HIGH상태
+클락이 HIGH 데이터 LOW->시작
+클락이 HIGH 데이터 HIGH->끝
+8데이터를 받으면 EEPROM에서 ACK신호를 준다
+
+START->Device Id(10100000)1010이후 3개비트는 정할 수 있고 마지막은 0으로 RroW->ACK->메모리신호8비트->ACK->데이터신호8비트->ACK->STOP
+START->10100000->ACK->읽을 메모리신호8비트->ACK->START->10100001->ACK->데이터8비트 읽음->ACK(이 ACK는 마스터가 주는것)->STOP
+
+SDA먼저 1 그후 SCL 1
+클락 HIGH/LOW상태에서 data는 변하지 않는다.(start stop)
+
+	digitalWriteBit(GPIO_A, 1, HIGH);//SCL 0 //SDA 1
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	
+//start
+	digitalWriteBit(GPIO_A, 1, LOW);//SDA LOW
+	Delay_ms(1);
+//standby
+	digitalWriteBit(GPIO_A, 0, LOW); //SCL LOW
+	Delay_ms(1);
+//DeviceID
+	digitalWriteBit(GPIO_A, 1, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------1//1010 0000
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+		digitalWriteBit(GPIO_A, 1, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------1
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+	digitalWriteBit(GPIO_A, 1,  LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+//ACK
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//Memory
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0//1010 0000
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+		digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+	digitalWriteBit(GPIO_A, 1,  LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+//ACK
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//dataWrite
+	digitalWriteBit(GPIO_A, 1, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------1//1010 0000
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+		digitalWriteBit(GPIO_A, 1, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------1
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+	digitalWriteBit(GPIO_A, 1,  HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------1
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+	digitalWriteBit(GPIO_A, 1, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------1
+	digitalWriteBit(GPIO_A, 1, LOW);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+	Delay_ms(1);
+//-----------------------------0
+//ACK
+	digitalWriteBit(GPIO_A, 0, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, LOW);
+//stop
+	digitalWriteBit(GPIO_A, 1, HIGH);
+	Delay_ms(1);
+	digitalWriteBit(GPIO_A, 0, HIGH);
+  Delay_ms(1);
+
+2402->2kbit
+
+-----------------------------
